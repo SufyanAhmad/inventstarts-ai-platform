@@ -1,0 +1,15 @@
+import uuid
+from contextvars import ContextVar
+
+request_id_context: ContextVar[str] = ContextVar(
+    "request_id",
+    default="unknown"
+)
+
+
+def get_request_id() -> str:
+    return request_id_context.get()
+
+
+def generate_request_id() -> str:
+    return str(uuid.uuid4())
