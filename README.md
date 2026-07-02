@@ -33,3 +33,20 @@ A production-style AI backend built with FastAPI and Gemini.
 ```bash
 conda activate mission-ai
 uvicorn app.main:app --reload
+## Automated Testing
+
+The project includes automated tests for:
+
+- Home endpoint
+- Health endpoint
+- Request validation
+- Mocked AI chat responses
+
+Tests run locally with Pytest and automatically through GitHub Actions.
+
+```bash
+pytest -v
+
+## Architecture
+
+Client → FastAPI Route → Service → Prompt Manager → Provider Interface → Gemini
