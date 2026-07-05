@@ -17,11 +17,18 @@ from app.api.conversations import (
 from app.exceptions.conversation_exceptions import (
     ConversationNotFoundException,
 )
+from contextlib import asynccontextmanager
 
+from app.database.init_db import init_db
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.APP_VERSION,
-    description="AI-powered services and automation platform by InventStarts."
+    description="AI-powered services and automation platform by InventStarts.",
+    lifespan=lifespan,
 )
 
 

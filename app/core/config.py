@@ -15,7 +15,10 @@ class Settings:
         "APP_VERSION",
         "1.0.0"
     )
-
+    DATABASE_URL = os.getenv(
+        "DATABASE_URL",
+        "sqlite+aiosqlite:///./app.db"
+    )
     AI_PROVIDER = os.getenv(
         "AI_PROVIDER",
         "gemini"

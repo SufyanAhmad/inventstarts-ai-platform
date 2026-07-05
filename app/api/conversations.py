@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database.session import get_db_session
 from app.middleware.request_context import get_request_id
 from app.schemas.common import APIResponse, ErrorResponse
 from app.schemas.conversation import (
@@ -14,26 +16,28 @@ from app.services.conversation_service import (
 
 router = APIRouter(
     prefix="/conversations",
-    tags=["Conversations"]
+    tags=["Conversations"],
 )
 
 
 @router.post(
     "/",
-    response_model=APIResponse[CreateConversationData]
+    response_model=APIResponse[CreateConversationData],
 )
-def create_conversation():
-    conversation_id = (
-        conversation_service.create_conversation()
+async def create_conversation(
+    session: AsyncSession = Depends(get_db_session),
+):
+    conversation_id = await conversation_service.create_conversation(
+        session=session,
     )
 
     return APIResponse[CreateConversationData](
         success=True,
         message="Conversation created successfully.",
         data=CreateConversationData(
-            conversation_id=conversation_id
+            conversation_id=conversation_id,
         ),
-        request_id=get_request_id()
+        request_id=get_request_id(),
     )
 
 
@@ -43,26 +47,28 @@ def create_conversation():
     responses={
         404: {
             "model": ErrorResponse,
-            "description": "Conversation not found"
+            "description": "Conversation not found",
         }
-    }
+    },
 )
 async def send_message(
     conversation_id: str,
-    request: SendMessageRequest
+    request: SendMessageRequest,
+    session: AsyncSession = Depends(get_db_session),
 ):
     conversation = await conversation_service.send_message(
+        session=session,
         conversation_id=conversation_id,
         message=request.message,
         temperature=request.temperature,
-        max_tokens=request.max_tokens
+        max_tokens=request.max_tokens,
     )
 
     return APIResponse[ConversationData](
         success=True,
         message="Message processed successfully.",
         data=conversation,
-        request_id=get_request_id()
+        request_id=get_request_id(),
     )
 
 
@@ -72,20 +78,22 @@ async def send_message(
     responses={
         404: {
             "model": ErrorResponse,
-            "description": "Conversation not found"
+            "description": "Conversation not found",
         }
-    }
+    },
 )
-def get_conversation(conversation_id: str):
-    conversation = (
-        conversation_service.get_conversation(
-            conversation_id
-        )
+async def get_conversation(
+    conversation_id: str,
+    session: AsyncSession = Depends(get_db_session),
+):
+    conversation = await conversation_service.get_conversation(
+        session=session,
+        conversation_id=conversation_id,
     )
 
     return APIResponse[ConversationData](
         success=True,
         message="Conversation retrieved successfully.",
         data=conversation,
-        request_id=get_request_id()
+        request_id=get_request_id(),
     )
