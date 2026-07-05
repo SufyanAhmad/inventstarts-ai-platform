@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
 from app.main import app
-
+from unittest.mock import AsyncMock, patch
 
 client = TestClient(app)
 
@@ -62,3 +62,57 @@ def test_chat_success(mock_chat):
     assert body["request_id"] is not None
 
     mock_chat.assert_awaited_once()
+    
+
+
+def test_create_conversation():
+    response = client.post("/conversations/")
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["success"] is True
+    assert body["data"]["conversation_id"]
+
+
+@patch(
+    "app.services.ai_service.ai_service.chat",
+    new_callable=AsyncMock,
+)
+def test_send_conversation_message(mock_chat):
+    mock_chat.return_value = "Mocked assistant reply."
+
+    create_response = client.post("/conversations/")
+    conversation_id = (
+        create_response.json()["data"]["conversation_id"]
+    )
+
+    response = client.post(
+        f"/conversations/{conversation_id}/messages",
+        json={
+            "message": "Hello",
+            "temperature": 0.7,
+            "max_tokens": 300,
+        },
+    )
+
+    assert response.status_code == 200
+
+    messages = response.json()["data"]["messages"]
+
+    assert len(messages) == 2
+    assert messages[0]["role"] == "user"
+    assert messages[1]["role"] == "assistant"
+
+
+def test_get_unknown_conversation():
+    response = client.get(
+        "/conversations/not-a-real-id"
+    )
+
+    assert response.status_code == 404
+    assert (
+        response.json()["error_code"]
+        == "CONVERSATION_NOT_FOUND"
+    )

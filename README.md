@@ -50,3 +50,12 @@ pytest -v
 ## Architecture
 
 Client → FastAPI Route → Service → Prompt Manager → Provider Interface → Gemini
+
+## Conversation History
+
+- Create a new conversation
+- Send messages to an existing conversation
+- Retrieve full conversation history
+- In-memory repository abstraction
+- 404 handling for unknown conversations
+- Mocked automated tests
