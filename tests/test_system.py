@@ -1,12 +1,18 @@
+import pytest
 from unittest.mock import AsyncMock, patch
-
 from fastapi.testclient import TestClient
 
 from app.main import app
-from unittest.mock import AsyncMock, patch
+from app.database.init_db import init_db
+
 
 client = TestClient(app)
 
+
+@pytest.fixture(scope="session", autouse=True)
+def initialize_test_database():
+    import asyncio
+    asyncio.run(init_db())
 
 def test_home_endpoint():
     response = client.get("/")
