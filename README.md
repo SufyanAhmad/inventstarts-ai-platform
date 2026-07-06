@@ -53,9 +53,15 @@ Client → FastAPI Route → Service → Prompt Manager → Provider Interface �
 
 ## Conversation History
 
-- Create a new conversation
-- Send messages to an existing conversation
-- Retrieve full conversation history
-- In-memory repository abstraction
+The platform now supports persistent conversation history using SQLAlchemy and SQLite.
+
+### Features
+
+- Create conversations
+- Send messages to conversations
+- Retrieve complete conversation history
+- Async SQLAlchemy repository
+- SQLite persistent storage
+- Repository pattern
 - 404 handling for unknown conversations
-- Mocked automated tests
+- Automated tests
