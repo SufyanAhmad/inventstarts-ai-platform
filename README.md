@@ -65,3 +65,11 @@ The platform now supports persistent conversation history using SQLAlchemy and S
 - Repository pattern
 - 404 handling for unknown conversations
 - Automated tests
+
+## Database
+
+The project uses:
+
+- SQLAlchemy 2.x async ORM
+- SQLite for local development
+- Alembic for database schema migrations
