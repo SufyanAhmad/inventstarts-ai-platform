@@ -3,6 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions.conversation_exceptions import (
     ConversationNotFoundException,
 )
+from app.models.conversation import (
+    ConversationMessage as ConversationMessageModel,
+)
 from app.repositories.conversation_repository import (
     ConversationRepository,
     conversation_repository,
@@ -39,20 +42,19 @@ class ConversationService:
         temperature: float,
         max_tokens: int,
     ) -> ConversationData:
-        await self._ensure_exists(
+        conversation = await self.repository.get_conversation(
             session=session,
             conversation_id=conversation_id,
         )
 
-        user_message = ConversationMessage(
-            role="user",
-            content=message,
-        )
+        if conversation is None:
+            raise ConversationNotFoundException(conversation_id)
 
         await self.repository.add_message(
             session=session,
             conversation_id=conversation_id,
-            message=user_message,
+            role="user",
+            content=message,
         )
 
         ai_response = await self.ai_service.chat(
@@ -61,16 +63,23 @@ class ConversationService:
             max_tokens=max_tokens,
         )
 
-        assistant_message = ConversationMessage(
+        await self.repository.add_message(
+            session=session,
+            conversation_id=conversation_id,
             role="assistant",
             content=ai_response,
         )
 
-        await self.repository.add_message(
-            session=session,
-            conversation_id=conversation_id,
-            message=assistant_message,
-        )
+        if conversation.title is None:
+            title = await self.ai_service.generate_conversation_title(
+                message
+            )
+
+            await self.repository.update_title(
+                session=session,
+                conversation_id=conversation_id,
+                title=title,
+            )
 
         return await self.get_conversation(
             session=session,
@@ -94,7 +103,10 @@ class ConversationService:
 
         return ConversationData(
             conversation_id=conversation_id,
-            messages=messages,
+            messages=[
+                self._map_message_to_schema(message)
+                for message in messages
+            ],
         )
 
     async def _ensure_exists(
@@ -108,9 +120,16 @@ class ConversationService:
         )
 
         if not exists:
-            raise ConversationNotFoundException(
-                conversation_id
-            )
+            raise ConversationNotFoundException(conversation_id)
+
+    @staticmethod
+    def _map_message_to_schema(
+        message: ConversationMessageModel,
+    ) -> ConversationMessage:
+        return ConversationMessage(
+            role=message.role,
+            content=message.content,
+        )
 
 
 conversation_service = ConversationService(

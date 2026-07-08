@@ -1,4 +1,5 @@
 from datetime import datetime
+from turtle import title
 from uuid import uuid4
 
 from sqlalchemy import DateTime, ForeignKey, String, Text
@@ -15,7 +16,10 @@ class Conversation(Base):
         primary_key=True,
         default=lambda: str(uuid4()),
     )
-
+    title: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,

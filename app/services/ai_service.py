@@ -13,7 +13,7 @@ class AIService:
         self,
         message: str,
         temperature: float = 0.7,
-        max_tokens: int = 300
+        max_tokens: int = 300,
     ) -> str:
         prompt = PromptManager.build_chat_prompt(message)
 
@@ -22,6 +22,20 @@ class AIService:
             temperature=temperature,
             max_tokens=max_tokens,
         )
+
+    async def generate_conversation_title(
+        self,
+        message: str,
+    ) -> str:
+        prompt = PromptManager.build_conversation_title_prompt(message)
+
+        title = await self.provider.generate_response(
+            message=prompt,
+            temperature=0.3,
+            max_tokens=30,
+        )
+
+        return title.strip().replace('"', "")
 
 
 provider = ProviderFactory.create(settings.AI_PROVIDER)

@@ -66,10 +66,64 @@ The platform now supports persistent conversation history using SQLAlchemy and S
 - 404 handling for unknown conversations
 - Automated tests
 
-## Database
+🚀 Milestone: Database-Backed Conversation History
 
-The project uses:
+The conversation history module has been upgraded from an in-memory implementation to a persistent database-backed architecture using SQLAlchemy Async ORM and SQLite.
 
-- SQLAlchemy 2.x async ORM
-- SQLite for local development
-- Alembic for database schema migrations
+This milestone establishes the foundation for production-ready data persistence while keeping the application database-agnostic for an easy transition to PostgreSQL in the future.
+
+✅ What Changed
+Replaced the in-memory conversation repository with a SQLAlchemy-based repository.
+Added persistent storage for conversations and conversation messages.
+Implemented asynchronous database operations using AsyncSession.
+Preserved the existing Repository Pattern and Service Layer architecture.
+Kept API behavior unchanged while replacing the underlying storage implementation.
+Maintained a clean separation of responsibilities:
+models/ → SQLAlchemy ORM entities (database models)
+schemas/ → Pydantic request/response DTOs (ViewModels)
+repositories/ → Database access only
+services/ → Business logic and mapping between ORM models and API schemas
+🗄️ Database Architecture
+
+Current database:
+
+SQLite
+
+Designed for future migration to:
+
+PostgreSQL
+
+Because the application is built on SQLAlchemy, changing the database backend will primarily require updating the connection string and running Alembic migrations, without changing the business logic.
+
+📦 Technologies
+FastAPI
+SQLAlchemy 2.x (Async ORM)
+SQLite
+Alembic
+Pydantic
+AsyncIO
+🧪 Testing
+
+All automated tests continue to pass after the migration from in-memory storage to database persistence.
+
+pytest -q
+
+Current status:
+
+7 passed
+📈 Architecture
+API
+   │
+   ▼
+Service Layer
+   │
+   ▼
+Repository Layer
+   │
+   ▼
+SQLAlchemy Async ORM
+   │
+   ▼
+SQLite
+
+This architecture follows production best practices by separating API contracts, business logic, and data access, making the platform maintainable, testable, and ready for future growth.
