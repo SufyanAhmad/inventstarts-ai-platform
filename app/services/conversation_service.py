@@ -7,14 +7,13 @@ from app.models.conversation import (
     ConversationMessage as ConversationMessageModel,
 )
 from app.repositories.conversation_repository import (
-    ConversationRepository,
-    conversation_repository,
+    ConversationRepository
 )
 from app.schemas.conversation import (
     ConversationData,
     ConversationMessage,
 )
-from app.services.ai_service import AIService, ai_service
+from app.services.ai_service import AIService
 
 
 class ConversationService:
@@ -131,8 +130,3 @@ class ConversationService:
             content=message.content,
         )
 
-
-conversation_service = ConversationService(
-    repository=conversation_repository,
-    ai_service=ai_service,
-)

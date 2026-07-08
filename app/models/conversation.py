@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from turtle import title
 from uuid import uuid4
 
@@ -22,7 +22,7 @@ class Conversation(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -59,7 +59,7 @@ class ConversationMessage(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
 

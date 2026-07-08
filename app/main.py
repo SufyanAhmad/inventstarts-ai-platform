@@ -25,8 +25,8 @@ async def lifespan(app: FastAPI):
     await init_db()
     yield
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.APP_VERSION,
+    title=settings.project_name,
+    version=settings.app_version,
     description="AI-powered services and automation platform by InventStarts.",
     lifespan=lifespan,
 )
@@ -90,9 +90,9 @@ app.include_router(conversation_router)
 def home():
     return {
         "success": True,
-        "message": f"Welcome to {settings.PROJECT_NAME}",
+        "message": f"Welcome to {settings.project_name}",
         "data": {
-            "version": settings.APP_VERSION,
+            "version": settings.app_version,
             "docs": "/docs",
             "health": "/health",
         },
@@ -107,10 +107,10 @@ def health():
         "success": True,
         "message": "Application is healthy.",
         "data": {
-            "service": settings.PROJECT_NAME,
-            "version": settings.APP_VERSION,
-            "provider": settings.AI_PROVIDER,
-            "model": settings.GEMINI_MODEL,
+            "service": settings.project_name,
+            "version": settings.app_version,
+            "provider": settings.ai_provider,
+            "model": settings.gemini_model,
         },
         "error_code": None,
         "request_id": get_request_id(),

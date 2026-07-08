@@ -38,5 +38,5 @@ class AIService:
         return title.strip().replace('"', "")
 
 
-provider = ProviderFactory.create(settings.AI_PROVIDER)
+provider = ProviderFactory.create(settings.ai_provider)
 ai_service = AIService(provider)

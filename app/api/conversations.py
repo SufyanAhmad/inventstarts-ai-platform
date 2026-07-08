@@ -9,9 +9,10 @@ from app.schemas.conversation import (
     CreateConversationData,
     SendMessageRequest,
 )
-from app.services.conversation_service import (
-    conversation_service,
-)
+from fastapi import Depends
+
+from app.dependencies.services import get_conversation_service
+from app.services.conversation_service import ConversationService
 
 
 router = APIRouter(
@@ -26,10 +27,9 @@ router = APIRouter(
 )
 async def create_conversation(
     session: AsyncSession = Depends(get_db_session),
+    service: ConversationService = Depends(get_conversation_service),
 ):
-    conversation_id = await conversation_service.create_conversation(
-        session=session,
-    )
+    conversation_id = await service.create_conversation(session)
 
     return APIResponse[CreateConversationData](
         success=True,
@@ -55,8 +55,10 @@ async def send_message(
     conversation_id: str,
     request: SendMessageRequest,
     session: AsyncSession = Depends(get_db_session),
+    service: ConversationService = Depends(get_conversation_service),
+
 ):
-    conversation = await conversation_service.send_message(
+    conversation = await service.send_message(
         session=session,
         conversation_id=conversation_id,
         message=request.message,
@@ -85,8 +87,9 @@ async def send_message(
 async def get_conversation(
     conversation_id: str,
     session: AsyncSession = Depends(get_db_session),
+    service: ConversationService = Depends(get_conversation_service),
 ):
-    conversation = await conversation_service.get_conversation(
+    conversation = await service.get_conversation(
         session=session,
         conversation_id=conversation_id,
     )

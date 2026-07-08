@@ -18,7 +18,7 @@ target_metadata = Base.metadata
 
 
 def get_sync_database_url() -> str:
-    return settings.DATABASE_URL.replace(
+    return settings.database_url.replace(
         "sqlite+aiosqlite",
         "sqlite"
     )

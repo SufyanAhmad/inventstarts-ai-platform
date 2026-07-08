@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.middleware.request_context import get_request_id
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.schemas.common import APIResponse, ErrorResponse
-from app.services.ai_service import ai_service
+import app.services.ai_service
 
 
 router = APIRouter(
@@ -43,7 +43,7 @@ router = APIRouter(
     },
 )
 async def chat(request: ChatRequest):
-    ai_response = await ai_service.chat(
+    ai_response = await app.services.ai_service.ai_service.chat(
         message=request.message,
         temperature=request.temperature,
         max_tokens=request.max_tokens,

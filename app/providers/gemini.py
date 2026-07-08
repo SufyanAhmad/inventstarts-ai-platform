@@ -25,12 +25,12 @@ class GeminiProvider(BaseLLMProvider):
 
     def __init__(self):
         self.client = genai.Client(
-            api_key=settings.GEMINI_API_KEY
+            api_key=settings.gemini_api_key
         )
 
     @retry(
         retry=retry_if_exception_type(TemporaryGeminiError),
-        stop=stop_after_attempt(settings.AI_MAX_RETRIES),
+        stop=stop_after_attempt(settings.ai_max_retries),
         wait=wait_exponential(
             multiplier=1,
             min=1,
@@ -47,14 +47,14 @@ class GeminiProvider(BaseLLMProvider):
         try:
             return await asyncio.wait_for(
                 self.client.aio.models.generate_content(
-                    model=settings.GEMINI_MODEL,
+                    model=settings.gemini_model,
                     contents=message,
                     config=types.GenerateContentConfig(
                         temperature=temperature,
                         max_output_tokens=max_tokens,
                     ),
                 ),
-                timeout=settings.AI_REQUEST_TIMEOUT_SECONDS,
+                timeout=settings.ai_request_timeout_seconds,
             )
 
         except asyncio.TimeoutError as exc:
@@ -94,7 +94,7 @@ class GeminiProvider(BaseLLMProvider):
             "Gemini call started | request_id=%s | "
             "model=%s | temperature=%s | max_tokens=%s",
             request_id,
-            settings.GEMINI_MODEL,
+            settings.gemini_model,
             temperature,
             max_tokens,
         )
