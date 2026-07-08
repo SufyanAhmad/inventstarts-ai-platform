@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-2.5-flash"
 
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-5.5"
+
     ai_request_timeout_seconds: float = 30
     ai_max_retries: int = 3
 
@@ -23,7 +26,7 @@ class Settings(BaseSettings):
     )
 
     def validate_settings(self) -> None:
-        supported_providers = {"gemini"}
+        supported_providers = {"gemini", "openai"}
 
         if self.ai_provider.lower() not in supported_providers:
             raise ValueError(
@@ -33,6 +36,11 @@ class Settings(BaseSettings):
         if self.ai_provider.lower() == "gemini" and not self.gemini_api_key:
             raise ValueError(
                 "GEMINI_API_KEY is missing from environment variables."
+            )
+
+        if self.ai_provider.lower() == "openai" and not self.openai_api_key:
+            raise ValueError(
+                "OPENAI_API_KEY is missing from environment variables."
             )
 
         if self.ai_request_timeout_seconds <= 0:

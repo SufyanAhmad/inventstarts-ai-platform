@@ -1,5 +1,6 @@
 from app.providers.base import BaseLLMProvider
 from app.providers.gemini import GeminiProvider
+from app.providers.openai import OpenAIProvider
 
 
 class ProviderFactory:
@@ -10,6 +11,9 @@ class ProviderFactory:
 
         if provider_name == "gemini":
             return GeminiProvider()
+
+        if provider_name == "openai":
+            return OpenAIProvider()
 
         raise ValueError(
             f"Unsupported AI provider: {provider_name}"
