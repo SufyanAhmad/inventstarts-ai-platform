@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from app.providers.response import ProviderResponse
+
 
 class BaseLLMProvider(ABC):
 
@@ -14,5 +16,5 @@ class BaseLLMProvider(ABC):
         message: str,
         temperature: float = 0.7,
         max_tokens: int = 300
-    ) -> str:
+    ) -> ProviderResponse:
         pass

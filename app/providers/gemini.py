@@ -15,6 +15,7 @@ from app.core.logger import logger
 from app.exceptions.ai_exceptions import AIProviderException
 from app.middleware.request_context import get_request_id
 from app.providers.base import BaseLLMProvider
+from app.providers.response import ProviderResponse
 
 
 class TemporaryGeminiError(Exception):
@@ -90,7 +91,7 @@ class GeminiProvider(BaseLLMProvider):
         message: str,
         temperature: float = 0.7,
         max_tokens: int = 300
-    ) -> str:
+    ) -> ProviderResponse:
         request_id = get_request_id()
         start_time = time.perf_counter()
 
@@ -119,18 +120,23 @@ class GeminiProvider(BaseLLMProvider):
                     status_code=502,
                 )
 
-            duration = round(
-                time.perf_counter() - start_time,
-                3
+            latency_ms = int(
+                (time.perf_counter() - start_time) * 1000
             )
 
             logger.info(
                 "Gemini call completed | request_id=%s | duration=%ss",
                 request_id,
-                duration,
+                round(latency_ms / 1000, 3),
             )
 
-            return response_text
+            return ProviderResponse(
+                content=response_text,
+                provider="gemini",
+                model=self.model_name,
+                latency_ms=latency_ms,
+                raw_response=response,
+            )
 
         except AIProviderException:
             raise

@@ -147,7 +147,13 @@ def test_send_conversation_message(
 
     assert len(messages) == 2
     assert messages[0]["role"] == "user"
-    assert messages[1]["role"] == "assistant"
+
+    assistant_message = messages[-1]
+
+    assert assistant_message["role"] == "assistant"
+    assert assistant_message["provider"] == "gemini"
+    assert assistant_message["model"] is not None
+    assert assistant_message["latency_ms"] is not None
 
 
 def test_get_unknown_conversation():
