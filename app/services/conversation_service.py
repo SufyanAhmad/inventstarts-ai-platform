@@ -11,7 +11,9 @@ from app.repositories.conversation_repository import (
 )
 from app.schemas.conversation import (
     ConversationData,
+    ConversationListData,
     ConversationMessage,
+    ConversationSummary,
 )
 from app.services.ai_service import AIService
 
@@ -32,6 +34,24 @@ class ConversationService:
     ) -> str:
         conversation = await self.repository.create(session)
         return conversation.id
+
+    async def get_conversations(
+        self,
+        session: AsyncSession,
+    ) -> ConversationListData:
+        conversations = await self.repository.get_conversations(
+            session=session,
+        )
+
+        return ConversationListData(
+            conversations=[
+                ConversationSummary(
+                    conversation_id=conversation.id,
+                    title=conversation.title,
+                )
+                for conversation in conversations
+            ],
+        )
 
     async def send_message(
         self,
@@ -66,7 +86,12 @@ class ConversationService:
             session=session,
             conversation_id=conversation_id,
             role="assistant",
-            content=ai_response,
+            content=ai_response.content,
+            provider=ai_response.provider,
+            model=ai_response.model,
+            temperature=ai_response.temperature,
+            max_tokens=ai_response.max_tokens,
+            latency_ms=ai_response.latency_ms,
         )
 
         if conversation.title is None:
@@ -128,5 +153,9 @@ class ConversationService:
         return ConversationMessage(
             role=message.role,
             content=message.content,
+            provider=message.provider,
+            model=message.model,
+            temperature=message.temperature,
+            max_tokens=message.max_tokens,
+            latency_ms=message.latency_ms,
         )
-

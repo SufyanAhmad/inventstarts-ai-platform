@@ -36,6 +36,10 @@ class OpenAIProvider(BaseLLMProvider):
             api_key=settings.openai_api_key
         )
 
+    @property
+    def model_name(self) -> str:
+        return settings.openai_model
+
     @retry(
         retry=retry_if_exception_type(TemporaryOpenAIError),
         stop=stop_after_attempt(settings.ai_max_retries),

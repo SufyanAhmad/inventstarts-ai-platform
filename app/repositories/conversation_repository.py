@@ -33,6 +33,16 @@ class ConversationRepository:
 
         return result.scalar_one_or_none() is not None
 
+    async def get_conversations(
+        self,
+        session: AsyncSession,
+    ) -> list[Conversation]:
+        result = await session.execute(
+            select(Conversation).order_by(Conversation.created_at)
+        )
+
+        return list(result.scalars().all())
+
     async def get_conversation(
         self,
         session: AsyncSession,
@@ -52,11 +62,21 @@ class ConversationRepository:
         conversation_id: str,
         role: str,
         content: str,
+        provider: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        latency_ms: int | None = None,
     ) -> ConversationMessageModel:
         db_message = ConversationMessageModel(
             conversation_id=conversation_id,
             role=role,
             content=content,
+            provider=provider,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            latency_ms=latency_ms,
         )
 
         session.add(db_message)

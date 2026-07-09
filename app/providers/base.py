@@ -3,6 +3,11 @@ from abc import ABC, abstractmethod
 
 class BaseLLMProvider(ABC):
 
+    @property
+    @abstractmethod
+    def model_name(self) -> str:
+        pass
+
     @abstractmethod
     async def generate_response(
         self,

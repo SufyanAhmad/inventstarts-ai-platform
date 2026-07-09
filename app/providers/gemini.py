@@ -28,6 +28,10 @@ class GeminiProvider(BaseLLMProvider):
             api_key=settings.gemini_api_key
         )
 
+    @property
+    def model_name(self) -> str:
+        return settings.gemini_model
+
     @retry(
         retry=retry_if_exception_type(TemporaryGeminiError),
         stop=stop_after_attempt(settings.ai_max_retries),

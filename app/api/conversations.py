@@ -6,10 +6,10 @@ from app.middleware.request_context import get_request_id
 from app.schemas.common import APIResponse, ErrorResponse
 from app.schemas.conversation import (
     ConversationData,
+    ConversationListData,
     CreateConversationData,
     SendMessageRequest,
 )
-from fastapi import Depends
 
 from app.dependencies.services import get_conversation_service
 from app.services.conversation_service import ConversationService
@@ -37,6 +37,26 @@ async def create_conversation(
         data=CreateConversationData(
             conversation_id=conversation_id,
         ),
+        request_id=get_request_id(),
+    )
+
+
+@router.get(
+    "/",
+    response_model=APIResponse[ConversationListData],
+)
+async def get_conversations(
+    session: AsyncSession = Depends(get_db_session),
+    service: ConversationService = Depends(get_conversation_service),
+):
+    conversations = await service.get_conversations(
+        session=session,
+    )
+
+    return APIResponse[ConversationListData](
+        success=True,
+        message="Conversations retrieved successfully.",
+        data=conversations,
         request_id=get_request_id(),
     )
 

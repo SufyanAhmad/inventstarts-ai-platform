@@ -6,10 +6,24 @@ from pydantic import BaseModel, Field
 class ConversationMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str
+    provider: str | None = None
+    model: str | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
+    latency_ms: int | None = None
 
 
 class CreateConversationData(BaseModel):
     conversation_id: str
+
+
+class ConversationSummary(BaseModel):
+    conversation_id: str
+    title: str | None = None
+
+
+class ConversationListData(BaseModel):
+    conversations: list[ConversationSummary]
 
 
 class SendMessageRequest(BaseModel):

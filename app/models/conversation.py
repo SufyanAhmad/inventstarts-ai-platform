@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
-from turtle import title
 from uuid import uuid4
 
+from sqlalchemy import Float, Integer
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -16,9 +16,9 @@ class Conversation(Base):
         primary_key=True,
         default=lambda: str(uuid4()),
     )
-    title: Mapped[str] = mapped_column(
+    title: Mapped[str | None] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -66,3 +66,10 @@ class ConversationMessage(Base):
     conversation: Mapped[Conversation] = relationship(
         back_populates="messages"
     )
+    provider = mapped_column(String, nullable=True)
+    model = mapped_column(String, nullable=True)
+
+    temperature = mapped_column(Float, nullable=True)
+    max_tokens = mapped_column(Integer, nullable=True)
+
+    latency_ms = mapped_column(Integer, nullable=True)

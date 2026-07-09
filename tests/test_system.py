@@ -1,9 +1,13 @@
+import os
 import pytest
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+
 from app.main import app
 from app.database.init_db import init_db
+from app.schemas.ai import AIResponse
 
 
 client = TestClient(app)
@@ -82,12 +86,46 @@ def test_create_conversation():
     assert body["data"]["conversation_id"]
 
 
+def test_get_conversations():
+    create_response = client.post("/conversations/")
+    conversation_id = (
+        create_response.json()["data"]["conversation_id"]
+    )
+
+    response = client.get("/conversations/")
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["success"] is True
+    assert {
+        "conversation_id": conversation_id,
+        "title": None,
+    } in body["data"]["conversations"]
+
+
 @patch(
     "app.services.ai_service.ai_service.chat",
     new_callable=AsyncMock,
 )
-def test_send_conversation_message(mock_chat):
-    mock_chat.return_value = "Mocked assistant reply."
+@patch(
+    "app.services.ai_service.ai_service.generate_conversation_title",
+    new_callable=AsyncMock,
+)
+def test_send_conversation_message(
+    mock_generate_conversation_title,
+    mock_chat,
+):
+    mock_chat.return_value = AIResponse(
+        content="Mocked assistant reply.",
+        provider="gemini",
+        model="gemini-2.5-flash",
+        temperature=0.7,
+        max_tokens=300,
+        latency_ms=123,
+    )
+    mock_generate_conversation_title.return_value = "Greeting"
 
     create_response = client.post("/conversations/")
     conversation_id = (

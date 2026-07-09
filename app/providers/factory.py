@@ -1,20 +1,22 @@
-from app.providers.base import BaseLLMProvider
 from app.providers.gemini import GeminiProvider
 from app.providers.openai import OpenAIProvider
 
 
 class ProviderFactory:
+    _providers = {
+        "gemini": GeminiProvider,
+        "openai": OpenAIProvider,
+    }
 
-    @staticmethod
-    def create(provider_name: str) -> BaseLLMProvider:
-        provider_name = provider_name.lower().strip()
+    @classmethod
+    def create(cls, provider_name: str):
+        provider = provider_name.lower()
 
-        if provider_name == "gemini":
-            return GeminiProvider()
+        provider_class = cls._providers.get(provider)
 
-        if provider_name == "openai":
-            return OpenAIProvider()
+        if provider_class is None:
+            raise ValueError(
+                f"Unsupported AI provider: {provider}"
+            )
 
-        raise ValueError(
-            f"Unsupported AI provider: {provider_name}"
-        )
+        return provider_class()
